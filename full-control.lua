@@ -174,6 +174,12 @@ local function get_env_with_gcode(gcode)
             )
             gcode:set_pos(target)
         end,
+
+        fan = function (config)
+            local amount = config.amount or error("need to define a fan amount")
+
+            gcode:append(string.format("M106 S%g", amount))
+        end
     }
 end
 
