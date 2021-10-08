@@ -12,6 +12,7 @@ for i = 0.3, 5, 0.3 do
 
     line {
         relative = { 0, 20, 0 },
+        speed = 10 * 60,
     }
 
     line {

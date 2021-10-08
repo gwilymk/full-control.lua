@@ -143,7 +143,7 @@ local function get_env_with_gcode(gcode)
             local travel_speed = gcode:get_config_option('travel_speed')
             local extrude_speed = gcode:get_config_option('extrude_speed')
 
-            local speed = travel and travel_speed or extrude_speed
+            local speed = config.speed or travel and travel_speed or extrude_speed
 
             if not eq_coords(current_pos, start_pos) then
                 -- move to the new start position
