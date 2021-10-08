@@ -16,22 +16,23 @@ line { relative = { 0, -BOX_SIDE, 0 } }
 
 local function bouncy_line(x_distance, y_distance, is_even_layer)
     local steps = math.ceil(math.sqrt(x_distance * x_distance + y_distance * y_distance) / Z_HOP / 2)
+    local hops = steps
 
     if is_even_layer then
-        steps = steps - 1
+        hops = steps - 1
         go {
             relative = { x_distance / steps / 2, y_distance / steps / 2, 0 }
         }
     end
 
-    for i = 0, steps do
+    for i = 1, hops do
         line {
             relative = {
                 x_distance / steps / 2,
                 y_distance / steps / 2,
                 Z_HOP
             },
-            speed = 10 * 60,
+            speed = 5 * 60,
         }
 
         line {
@@ -40,7 +41,7 @@ local function bouncy_line(x_distance, y_distance, is_even_layer)
                 y_distance / steps / 2,
                 -Z_HOP
             },
-            speed = 10 * 60
+            speed = 5 * 60
         }
     end
 
@@ -61,5 +62,5 @@ for i = 1, 10 do
     bouncy_line(-BOX_SIDE, 0, is_even_layer)
     bouncy_line(0, -BOX_SIDE, is_even_layer)
 
-    go { relative = { 0, 0, Z_HOP } }
+    go { relative = { 0, 0, Z_HOP / 3 } }
 end
