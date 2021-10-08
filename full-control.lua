@@ -8,6 +8,8 @@ local default_config = {
     extrude_speed = 35 * 60,
 
     filament_diameter = 1.75,
+
+    max_print_height = 205,
 }
 
 local preamble = [[
@@ -25,7 +27,30 @@ G1 X60.0 E9.0 F1000.0 ; intro line
 G1 X100.0 E12.5 F1000.0 ; intro line
 G92 E0.0
 M221 S100
+
+M204 S800 ; set the acceleration (TODO: make this configurable)
 ]]
+
+local function generate_ending(gcode)
+    local basic = [[
+
+G4 ; wait
+M221 S100 ; reset flow
+M900 K0 ; reset LA
+M907 E538 ; reset extruder motor current
+M104 S0 ; turn off temperature
+M140 S0 ; turn off heatbed
+M107 ; turn off fan
+G1 Z%g ; Move print head up
+G1 X0 Y200 F3000 ; home X axis
+M84 ; disable motors
+]]
+
+    local finishing_pos = gcode:get_pos()
+    local final_z = math.min(finishing_pos[3] + 30, default_config.max_print_height)
+
+    gcode:append(string.format(basic, final_z))
+end
 
 local function calculate_extrusion(length, width, height)
     local cross_section = width * height
@@ -146,8 +171,9 @@ local function main(args)
     gcode:append(preamble)
 
     local env = get_env_with_gcode(gcode)
-
     run_with_env(env, script_fn)
+
+    generate_ending(gcode)
 
     gcode:print()
 end
