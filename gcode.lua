@@ -9,6 +9,8 @@ function GCode.new(default_config)
     return {
         current_snippets = {},
         config = config_object,
+
+        current_pos = {0, 0, 0},
     }
 end
 
@@ -27,8 +29,20 @@ function GCode:append(code)
     self.current_snippets[#self.current_snippets + 1] = code
 end
 
+function GCode:get_pos()
+    return self.current_pos
+end
+
+function GCode:set_pos(new_pos)
+    self.current_pos = new_pos
+end
+
 function GCode:set_config_option(option, value)
     self.config[option] = value
+end
+
+function GCode:get_config_option(option)
+    return self.config[option]
 end
 
 local GCode_mt = {__index = GCode}
