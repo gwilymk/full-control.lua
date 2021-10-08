@@ -102,6 +102,8 @@ end
 
 local function get_env_with_gcode(gcode)
     return {
+        math = math,
+
         first_layer_bed_temperature = function (temp)
             gcode:set_config_option('first_layer_bed_temperature', temp)
         end,
