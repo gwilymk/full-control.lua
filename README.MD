@@ -1,6 +1,6 @@
 # Full control.lua
 
-This is a reimagining of the [http://fullcontrolgcode.com/](full control) project.
+This is a reimagining of the [full control](http://fullcontrolgcode.com/) project.
 It aims to give you full access to all the capabilities of your 3d printer.
 
 You can write a simple lua script (see the examples) to directly control your 3d printer to make exactly the moves you want.
