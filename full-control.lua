@@ -89,13 +89,13 @@ local function cartesian_distance(start_pos, final_pos)
     return math.sqrt(diff[1] * diff[1] + diff[2] * diff[2] + diff[3] * diff[3])
 end
 
-local function get_extrusion(config, length)
+local function get_extrusion(config, gcode, length)
     if config.travel then
         return 0, true
     end
 
-    local width = config.width or error("must set width property")
-    local height = config.height or error("must set height property")
+    local width = config.width or gcode:get_config_option('extrusion_width') or error("must set width property")
+    local height = config.height or gcode:get_config_option('extrusion_height') or error("must set height property")
 
     return calculate_extrusion(length, width, height), false
 end
@@ -108,6 +108,14 @@ local function get_env_with_gcode(gcode)
 
         first_layer_temperature = function (temp)
             gcode:set_config_option('first_layer_temperature', temp)
+        end,
+
+        extrusion_width = function (width)
+            gcode:set_config_option('extrusion_width', width)
+        end,
+
+        extrusion_height = function (height)
+            gcode:set_config_option('extrusion_height', height)
         end,
 
         -- gcode commands
@@ -128,7 +136,7 @@ local function get_env_with_gcode(gcode)
 
             local distance = cartesian_distance(start_pos, final_pos)
 
-            local extrusion, travel = get_extrusion(config, distance)
+            local extrusion, travel = get_extrusion(config, gcode, distance)
 
             local current_pos = gcode:get_pos()
             
@@ -148,6 +156,21 @@ local function get_env_with_gcode(gcode)
                 string.format("G1 X%g Y%g Z%g E%g F%g", final_pos[1], final_pos[2], final_pos[3], extrusion, speed)
             )
             gcode:set_pos(final_pos)
+        end,
+
+        go = function (config)
+            local target = config.final
+            if target == nil then
+                local relative = config.relative or error("need to define one of final or relative")
+                target = add_coords(gcode:get_pos(), relative)
+            end
+
+            local travel_speed = gcode:get_config_option('travel_speed')
+
+            gcode:append(
+                string.format("G1 X%g Y%g Z%g E0 F%g", target[1], target[2], target[3], travel_speed)
+            )
+            gcode:set_pos(target)
         end,
     }
 end
